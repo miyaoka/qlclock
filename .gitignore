@@ -1,0 +1,15 @@
+#MacOS
+.DS_Store
+
+#build
+bin/
+bin-debug/
+bin-release/
+
+#flex
+.actionScriptProperties
+.flexProperties
+.flexLibProperties
+.project
+.settings/
+
