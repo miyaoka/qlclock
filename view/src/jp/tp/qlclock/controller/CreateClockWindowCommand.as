@@ -20,7 +20,7 @@ package jp.tp.qlclock.controller
 			var initOptions:NativeWindowInitOptions = new NativeWindowInitOptions;
 			initOptions.systemChrome = NativeWindowSystemChrome.NONE;
 			initOptions.transparent = Boolean(n.getBody());
-			//			initOptions.type = NativeWindowType.LIGHTWEIGHT;
+			initOptions.type = NativeWindowType.LIGHTWEIGHT;
 			//			initOptions.type = NativeWindowType.UTILITY;
 			
 			
