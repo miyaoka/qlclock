@@ -34,6 +34,6 @@
 	</fx:Script>
 	<fx:Declarations>
 		<!--MCをUIComponent中心に配置-->
-		<assets:Clock id="clock" x="{width/2}" y="{height/2}"/>
+		<assets:Clock id="clock"/>
 	</fx:Declarations>
 </mx:UIComponent>

@@ -3,12 +3,16 @@ package jp.tp.qlclock.view.component
 	import flash.display.NativeWindowInitOptions;
 	import flash.display.NativeWindowSystemChrome;
 	import flash.display.NativeWindowType;
+	import flash.display.StageDisplayState;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.NativeWindowBoundsEvent;
+	import flash.geom.Point;
 	import flash.geom.Rectangle;
+	import flash.system.Capabilities;
 	
 	import jp.tp.qlclock.assets.Clock;
+	import jp.tp.qlclock.model.vo.ClockBoundsVO;
 	import jp.tp.qlclock.view.event.ClockWindowEvent;
 	
 	[Event(name="frameResize", type="jp.tp.qlclock.view.event.ClockWindowEvent")]
@@ -17,16 +21,22 @@ package jp.tp.qlclock.view.component
 		public var clockComp:ClockContainer;
 		public var clockMC:Clock;
 		
+		private var resizeBeforeBounds:ClockBoundsVO;
+		private var resizeBeforeRadius:Number;
+		private var resizeBeforeSize:Number;
+		
+		//時計MCサイズとウィンドウのマージン（MC.width + margin = window.width）
+		private var windowMargin:Number = 20;		
+		
+		//リサイズ拡大時に一度に拡大するウィンドウサイズ
+		private var windowExpandSize:Number = 200;
 		
 		public function ClockWindow(initOptions:NativeWindowInitOptions)
 		{
 			super(initOptions);
-			title = "clock";
 			
 			//UIComponent追加
 			clockComp = new ClockContainer;
-			//compをwindowと同じ大きさにしてセンターにMCが来るようにする
-			clockComp.percentWidth = clockComp.percentHeight = 100;
 			addChildControls(clockComp);
 			
 			//Comp内のMC参照
@@ -39,13 +49,13 @@ package jp.tp.qlclock.view.component
 			clockMC.frame.buttonMode = true;
 			clockMC.frame.addEventListener(MouseEvent.MOUSE_DOWN, onClockFrameMouseDown);
 			
-		}
-		public function setBounds(b:Rectangle):void
-		{
-			if(b.equals(bounds)) return;
+			addEventListener(NativeWindowBoundsEvent.RESIZE, onWindowResize);
 			
-			bounds = b;
-			fitMCtoWindow();
+		}
+		public function setBounds(b:ClockBoundsVO):void
+		{
+			clockMC.width = clockMC.height = b.size;
+			fitWindowToMC(b);
 		}
 		/**
 		 * フレーム以外をマウス押下でドラッグ
@@ -65,70 +75,100 @@ package jp.tp.qlclock.view.component
 		private function onClockFrameMouseDown(e:MouseEvent):void
 		{
 			//baseスケールを保存
-			resizeBaseBounds = bounds.clone();
-			resizeBaseScale = clockMC.scaleX;
-			resizeBaseRadius = getRadius();
-			resizeCenterX = x + clockMC.x;
-			resizeCenterY = y + clockMC.y;
+			resizeBeforeBounds = clockBounds;
+			resizeBeforeRadius = getRadius();
+			resizeBeforeSize = clockMC.width;
 			
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onStageMouseMove);
 			stage.addEventListener(MouseEvent.MOUSE_UP, onStageMouseUp);
+			
+			//一時的にリサイズハンドラ解除
+			removeEventListener(NativeWindowBoundsEvent.RESIZE, onWindowResize);
 		}
-		private var resizeBaseBounds:Rectangle;
-		private var resizeBaseScale:Number;
-		private var resizeBaseRadius:Number;
-		private var resizeCenterX:Number;
-		private var resizeCenterY:Number;
+		
+
+		
 		/**
 		 * リサイズ中
 		 */ 
 		private function onStageMouseMove(e:MouseEvent):void
 		{
 			//中心点からのマウス座標で半径を求めサイズ比を算出
-			var multiplyScale:Number = getRadius() / resizeBaseRadius;
+			var multiplyScale:Number = getRadius() / resizeBeforeRadius;
+			var clockSize:Number = resizeBeforeSize * multiplyScale;
 			
-			//初期スケールに現在のサイズ比を適用する
-			clockMC.scaleX =
-			clockMC.scaleY = resizeBaseScale * multiplyScale;
+			//時計MCサイズを変える
+			clockMC.width = clockMC.height = clockSize;
 			
-			//MCと同サイズにウィンドウサイズを合わせる
-			fitWindowToMC();
+			//ドラッグ中は現在のウィンドウより大きい場合のみリサイズ
+			//（transparentだとリサイズ時に一瞬MCも影響を受けるので動的なリサイズ回数を極力減らす）
+			if(width < clockSize + windowMargin)
+			{
+				//拡大時には200pxずつ加算する
+				fitWindowToMC(new ClockBoundsVO(resizeBeforeBounds.x, resizeBeforeBounds.y, clockSize + windowExpandSize));
+			}
 		}
 		/**
-		 * リサイズ終了
+		 * リサイズ確定
 		 */ 
 		private function onStageMouseUp(e:MouseEvent):void
 		{
 			stage.removeEventListener(MouseEvent.MOUSE_MOVE, onStageMouseMove);
 			stage.removeEventListener(MouseEvent.MOUSE_UP, onStageMouseUp);
-			if(resizeBaseBounds.width != bounds.width || resizeBaseBounds.height != bounds.height)
+			
+			//確定したMCサイズに合わせてウィンドウを合わせる
+			fitWindowToMC(new ClockBoundsVO(resizeBeforeBounds.x, resizeBeforeBounds.y, clockMC.width));
+			
+			//リサイズハンドラを戻す
+			addEventListener(NativeWindowBoundsEvent.RESIZE, onWindowResize);
+			
+			var b:ClockBoundsVO = clockBounds;
+			
+			if(resizeBeforeBounds.x != b.x || resizeBeforeBounds.y != b.y || clockBounds)
 			{
 				dispatchEvent(new ClockWindowEvent(ClockWindowEvent.FRAME_RESIZE));
 			}
 		}
+		public function get clockBounds():ClockBoundsVO
+		{
+			var center:Point = globalToScreen(new Point(clockMC.x, clockMC.y));
+			return new ClockBoundsVO(center.x, center.y, clockMC.width);
+		}
 		/**
 		 * MCリサイズ時にウィンドウサイズを合わせる
 		 */ 
-		private function fitWindowToMC():void
+		private function fitWindowToMC(b:ClockBoundsVO):void
 		{
-			var clockSize:Number = clockMC.width + margin;
+			var winSize:Number = b.size + windowMargin;
+			var w:Number = (minSize.x > winSize) ? minSize.x : winSize;
+			var h:Number = (minSize.y > winSize) ? minSize.y : winSize;
 			
 			bounds = new Rectangle(
-				resizeCenterX - clockSize/2, 
-				resizeCenterY - clockSize/2, 
-				clockSize,
-				clockSize
+				b.x - w/2, 
+				b.y - h/2, 
+				w,
+				h
 			);
+			
+			clockMC.x = w/2;
+			clockMC.y = h/2;
+		}
+		private function onWindowResize(e:NativeWindowBoundsEvent):void
+		{
+			fitMCtoWindow();
 		}
 		/**
 		 * ウィンドウリサイズ時にMCを合わせる
+		 * 
+		 * 起動時、最大化時、フルスクリーン時対応
 		 */ 
 		private function fitMCtoWindow():void
 		{
-			var size:Number = width - margin;
+			var size:Number = Math.min(width, height) - windowMargin;
 			clockMC.width = clockMC.height = size;
+			clockMC.x = Math.floor(width / 2);
+			clockMC.y = Math.floor(height / 2);
 		}
-		private var margin:Number = 32;
 		
 		/**
 		 * マウス位置からスケールを求める
@@ -137,9 +177,8 @@ package jp.tp.qlclock.view.component
 		{
 			var mx:Number = stage.mouseX - clockMC.x;
 			var my:Number = stage.mouseY - clockMC.y;
+				
 			return Math.sqrt(mx*mx + my*my);
-			
-			return Math.sqrt(clockMC.mouseX * clockMC.mouseX + clockMC.mouseY * clockMC.mouseY);
 		}		
 	}
 }

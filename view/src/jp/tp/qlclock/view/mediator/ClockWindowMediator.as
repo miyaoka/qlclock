@@ -1,5 +1,8 @@
 package jp.tp.qlclock.view.mediator
 {
+	import flash.display.NativeMenu;
+	import flash.display.NativeMenuItem;
+	import flash.events.Event;
 	import flash.events.NativeWindowBoundsEvent;
 	import flash.geom.Rectangle;
 	
@@ -7,6 +10,7 @@ package jp.tp.qlclock.view.mediator
 	import jp.tp.qlclock.controller.constant.AppConstants;
 	import jp.tp.qlclock.model.proxy.ClockTimeProxy;
 	import jp.tp.qlclock.model.proxy.ConfigProxy;
+	import jp.tp.qlclock.model.vo.ClockBoundsVO;
 	import jp.tp.qlclock.view.component.ClockWindow;
 	import jp.tp.qlclock.view.event.ClockWindowEvent;
 	import jp.tp.qlclock.view.event.FlexNativeWindowEvent;
@@ -47,7 +51,7 @@ package jp.tp.qlclock.view.mediator
 			//show view
 			view.activate();
 			
-			
+
 			return;
 			view.clockMC.cover.visible = false;
 			view.clockMC.hands.hourHand.filters =
@@ -75,7 +79,7 @@ package jp.tp.qlclock.view.mediator
 					updateTime();
 					break;
 				case ConfigProxy.UPDATE_BOUNDS:
-					onUpdateBounds(Rectangle(n.getBody()));
+					onUpdateBounds(ClockBoundsVO(n.getBody()));
 					break;
 			}
 		}		
@@ -96,7 +100,10 @@ package jp.tp.qlclock.view.mediator
 		{
 			view.setBounds(configProxy.bounds);
 		}
-		private function onUpdateBounds(b:Rectangle):void
+		/**
+		 * modelのboundが変更されたとき
+		 */ 
+		private function onUpdateBounds(b:ClockBoundsVO):void
 		{
 			view.setBounds(b)
 		}
@@ -113,7 +120,7 @@ package jp.tp.qlclock.view.mediator
 		}
 		private function saveBounds():void
 		{
-			sendNotification(AppConstants.SAVE_BOUNDS, view.bounds);
+			sendNotification(AppConstants.SAVE_BOUNDS, view.clockBounds);
 		}
 		private function get view():ClockWindow
 		{
@@ -128,18 +135,18 @@ package jp.tp.qlclock.view.mediator
 			view.close();
 			facade.removeMediator(NAME);
 		}
-
+		
 		private function initContextMenu():void
 		{
 			restoreMenu.addEventListener(Event.SELECT, onRestore);
 			transparentMenu.addEventListener(Event.SELECT, onTrans);
 			quitMenu.addEventListener(Event.SELECT, onQuit);
-
+			
 			var iconMenu:NativeMenu = new NativeMenu();
 			iconMenu.addItem(transparentMenu);
 			iconMenu.addItem(restoreMenu);
 			iconMenu.addItem(new NativeMenuItem("", true));//Separator
-			iconMenu.addItem(quitMenu);
+			iconMenu.addItem(quitMenu);			
 			view.clockMC.contextMenu = iconMenu;
 		}
 		private var quitMenu:NativeMenuItem = new NativeMenuItem("Close");
@@ -156,6 +163,6 @@ package jp.tp.qlclock.view.mediator
 		private function onQuit(e:Event):void
 		{
 			close();
-		}
+		}		
 	}
 }

@@ -3,6 +3,8 @@ package jp.tp.qlclock.model.proxy
 	import flash.geom.Rectangle;
 	import flash.net.SharedObject;
 	
+	import jp.tp.qlclock.model.vo.ClockBoundsVO;
+	
 	import org.puremvc.as3.patterns.proxy.Proxy;
 	
 	public class ConfigProxy extends Proxy
@@ -13,7 +15,7 @@ package jp.tp.qlclock.model.proxy
 		public static const UPDATE_BOUNDS:String = NAME + "/updateBounds";
 		
 		private var so:SharedObject;
-		private var _bounds:Rectangle;
+		private var _bounds:ClockBoundsVO;
 		
 		public function ConfigProxy()
 		{
@@ -26,7 +28,7 @@ package jp.tp.qlclock.model.proxy
 			var b:Object = so.data.bounds;
 			if(b)
 			{
-				_bounds = new Rectangle(b.x, b.y, b.width, b.height);
+				_bounds = new ClockBoundsVO(b.x, b.y, b.size)
 			}
 			else
 			{
@@ -41,12 +43,12 @@ package jp.tp.qlclock.model.proxy
 		{
 			so.flush();
 		}		
-		public function get bounds():Rectangle
+		public function get bounds():ClockBoundsVO
 		{
-			return _bounds.clone();
+			return _bounds;
 		}
 		
-		public function set bounds(value:Rectangle):void
+		public function set bounds(value:ClockBoundsVO):void
 		{
 			_bounds = value;
 			so.data.bounds = value;
@@ -55,8 +57,8 @@ package jp.tp.qlclock.model.proxy
 		}
 		public function restoreDefaultBounds():void
 		{
-			bounds = defaultBounds.clone();
+			bounds = defaultBounds;
 		}
-		private var defaultBounds:Rectangle = new Rectangle(50,50,200,200);
+		private var defaultBounds:ClockBoundsVO = new ClockBoundsVO(200, 200, 200);
 	}
 }
