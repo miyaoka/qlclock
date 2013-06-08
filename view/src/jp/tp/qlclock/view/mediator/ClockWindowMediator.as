@@ -116,5 +116,14 @@ package jp.tp.qlclock.view.mediator
 		{
 			return viewComponent as ClockWindow;
 		}		
+		public function get transparent():Boolean
+		{
+			return view.transparent;
+		}
+		public function close():void
+		{
+			view.close();
+			facade.removeMediator(NAME);
+		}
 	}
 }

@@ -1,5 +1,6 @@
 package jp.tp.qlclock.controller.command.startup
 {
+	import jp.tp.qlclock.controller.constant.AppConstants;
 	import jp.tp.qlclock.view.component.ClockWindow;
 	import jp.tp.qlclock.view.component.ConfigWindow;
 	import jp.tp.qlclock.view.mediator.AppMediator;
@@ -15,9 +16,8 @@ package jp.tp.qlclock.controller.command.startup
 		{
 			var app:QlClock = QlClock(n.getBody());
 			
-			var clw:ClockWindow = new ClockWindow();
 			facade.registerMediator(new AppMediator(app));
-			facade.registerMediator(new ClockWindowMediator(clw));
+			sendNotification(AppConstants.CREATE_CLOCK_WINDOW, true);
 //			facade.registerMediator(new ConfigWindowMediator(new ConfigWindow));
 		}
 	}

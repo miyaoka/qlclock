@@ -18,15 +18,8 @@ package jp.tp.qlclock.view.component
 		public var clockMC:Clock;
 		
 		
-		public function ClockWindow()
+		public function ClockWindow(initOptions:NativeWindowInitOptions)
 		{
-			var initOptions:NativeWindowInitOptions = new NativeWindowInitOptions;
-			initOptions.systemChrome = NativeWindowSystemChrome.NONE;
-//			initOptions.transparent = true;
-//			initOptions.type = NativeWindowType.LIGHTWEIGHT;
-			initOptions.type = NativeWindowType.UTILITY;
-			
-			
 			super(initOptions);
 			title = "clock";
 			
