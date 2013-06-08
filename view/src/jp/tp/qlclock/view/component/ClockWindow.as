@@ -23,7 +23,6 @@ package jp.tp.qlclock.view.component
 		
 		private var resizeBeforeBounds:ClockBoundsVO;
 		private var resizeBeforeRadius:Number;
-		private var resizeBeforeSize:Number;
 		
 		//時計MCサイズとウィンドウのマージン（MC.width + margin = window.width）
 		private var windowMargin:Number = 20;		
@@ -77,7 +76,8 @@ package jp.tp.qlclock.view.component
 			//baseスケールを保存
 			resizeBeforeBounds = clockBounds;
 			resizeBeforeRadius = getRadius();
-			resizeBeforeSize = clockMC.width;
+			resizeBeforeBounds.x = Math.ceil(resizeBeforeBounds.x);
+			resizeBeforeBounds.y = Math.ceil(resizeBeforeBounds.y);
 			
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onStageMouseMove);
 			stage.addEventListener(MouseEvent.MOUSE_UP, onStageMouseUp);
@@ -95,7 +95,7 @@ package jp.tp.qlclock.view.component
 		{
 			//中心点からのマウス座標で半径を求めサイズ比を算出
 			var multiplyScale:Number = getRadius() / resizeBeforeRadius;
-			var clockSize:Number = resizeBeforeSize * multiplyScale;
+			var clockSize:Number = resizeBeforeBounds.size * multiplyScale;
 			
 			//時計MCサイズを変える
 			clockMC.width = clockMC.height = clockSize;
@@ -122,9 +122,9 @@ package jp.tp.qlclock.view.component
 			//リサイズハンドラを戻す
 			addEventListener(NativeWindowBoundsEvent.RESIZE, onWindowResize);
 			
+			//サイズが更新されていれば通知
 			var b:ClockBoundsVO = clockBounds;
-			
-			if(resizeBeforeBounds.x != b.x || resizeBeforeBounds.y != b.y || clockBounds)
+			if(resizeBeforeBounds.x != b.x || resizeBeforeBounds.y != b.y || resizeBeforeBounds.size != b.size)
 			{
 				dispatchEvent(new ClockWindowEvent(ClockWindowEvent.FRAME_RESIZE));
 			}
@@ -140,8 +140,8 @@ package jp.tp.qlclock.view.component
 		private function fitWindowToMC(b:ClockBoundsVO):void
 		{
 			var winSize:Number = b.size + windowMargin;
-			var w:Number = (minSize.x > winSize) ? minSize.x : winSize;
-			var h:Number = (minSize.y > winSize) ? minSize.y : winSize;
+			var w:Number = Math.ceil((minSize.x > winSize) ? minSize.x : winSize);
+			var h:Number = Math.ceil((minSize.y > winSize) ? minSize.y : winSize);
 			
 			bounds = new Rectangle(
 				b.x - w/2, 
@@ -150,8 +150,8 @@ package jp.tp.qlclock.view.component
 				h
 			);
 			
-			clockMC.x = w/2;
-			clockMC.y = h/2;
+			clockMC.x = b.x - x;
+			clockMC.y = b.y - y;
 		}
 		private function onWindowResize(e:NativeWindowBoundsEvent):void
 		{
