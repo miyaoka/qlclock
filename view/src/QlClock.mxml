@@ -27,14 +27,8 @@
 			
 			protected function windowedapplication1_addedToStageHandler(event:Event):void
 			{
-				
-				
-				
-//				new ConfigWindow();
-				
 				//close default windowed app(this)
 				close();
-				
 			}
 			
 		]]>
