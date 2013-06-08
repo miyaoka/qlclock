@@ -41,6 +41,9 @@ package jp.tp.qlclock.view.mediator
 			//set view appearance
 			view.clockMC.edit.visible = false;
 			
+			//set view menu
+			initContextMenu();
+
 			//show view
 			view.activate();
 			
@@ -124,6 +127,35 @@ package jp.tp.qlclock.view.mediator
 		{
 			view.close();
 			facade.removeMediator(NAME);
+		}
+
+		private function initContextMenu():void
+		{
+			restoreMenu.addEventListener(Event.SELECT, onRestore);
+			transparentMenu.addEventListener(Event.SELECT, onTrans);
+			quitMenu.addEventListener(Event.SELECT, onQuit);
+
+			var iconMenu:NativeMenu = new NativeMenu();
+			iconMenu.addItem(transparentMenu);
+			iconMenu.addItem(restoreMenu);
+			iconMenu.addItem(new NativeMenuItem("", true));//Separator
+			iconMenu.addItem(quitMenu);
+			view.clockMC.contextMenu = iconMenu;
+		}
+		private var quitMenu:NativeMenuItem = new NativeMenuItem("Close");
+		private var restoreMenu:NativeMenuItem = new NativeMenuItem("Reset bounds");
+		private var transparentMenu:NativeMenuItem = new NativeMenuItem("Toggle transparent");
+		private function onRestore(e:Event):void
+		{
+			sendNotification(AppConstants.RESTORE_DEFAULT_BOUNDS);
+		}
+		private function onTrans(e:Event):void
+		{
+			sendNotification(AppConstants.TOGGLE_TRANSPARENT);
+		}
+		private function onQuit(e:Event):void
+		{
+			close();
 		}
 	}
 }
