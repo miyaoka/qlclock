@@ -60,7 +60,8 @@ package jp.tp.qlclock.view.mediator
 		override public function listNotificationInterests():Array
 		{
 			return [
-				ClockTimeProxy.TIME_UPDATED
+				ClockTimeProxy.TIME_UPDATED,
+				ConfigProxy.UPDATE_BOUNDS
 			];
 		}
 		override public function handleNotification(n:INotification):void
@@ -69,6 +70,9 @@ package jp.tp.qlclock.view.mediator
 			{
 				case ClockTimeProxy.TIME_UPDATED:
 					updateTime();
+					break;
+				case ConfigProxy.UPDATE_BOUNDS:
+					onUpdateBounds(Rectangle(n.getBody()));
 					break;
 			}
 		}		
@@ -87,14 +91,11 @@ package jp.tp.qlclock.view.mediator
 		 */ 
 		private function restoreBounds():void
 		{
-			view.setBounds(configProxy.bounds || initBounds);
+			view.setBounds(configProxy.bounds);
 		}
-		/**
-		 * デフォルトのbounds
-		 */
-		private function get initBounds():Rectangle
+		private function onUpdateBounds(b:Rectangle):void
 		{
-			return new Rectangle(50,50,200,200);
+			view.setBounds(b)
 		}
 		/**
 		 * 位置移動とリサイズ時にboundsを保存する

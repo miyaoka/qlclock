@@ -10,6 +10,7 @@ package jp.tp.qlclock.model.proxy
 		//name
 		public static const NAME:String = "ConfigProxy";
 		//notes
+		public static const UPDATE_BOUNDS:String = NAME + "/updateBounds";
 		
 		private var so:SharedObject;
 		private var _bounds:Rectangle;
@@ -18,19 +19,6 @@ package jp.tp.qlclock.model.proxy
 		{
 			super(NAME);
 		}
-
-		public function get bounds():Rectangle
-		{
-			return _bounds;
-		}
-
-		public function set bounds(value:Rectangle):void
-		{
-			_bounds = value;
-			so.data.bounds = value;
-			save();
-		}
-
 		override public function onRegister():void
 		{
 			so = SharedObject.getLocal("conf");
@@ -39,6 +27,10 @@ package jp.tp.qlclock.model.proxy
 			if(b)
 			{
 				_bounds = new Rectangle(b.x, b.y, b.width, b.height);
+			}
+			else
+			{
+				restoreDefaultBounds();
 			}
 		}
 		override public function onRemove():void
@@ -49,5 +41,22 @@ package jp.tp.qlclock.model.proxy
 		{
 			so.flush();
 		}		
+		public function get bounds():Rectangle
+		{
+			return _bounds.clone();
+		}
+		
+		public function set bounds(value:Rectangle):void
+		{
+			_bounds = value;
+			so.data.bounds = value;
+			save();
+			sendNotification(UPDATE_BOUNDS, bounds);
+		}
+		public function restoreDefaultBounds():void
+		{
+			bounds = defaultBounds.clone();
+		}
+		private var defaultBounds:Rectangle = new Rectangle(50,50,200,200);
 	}
 }

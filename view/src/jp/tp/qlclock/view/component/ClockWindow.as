@@ -49,6 +49,8 @@ package jp.tp.qlclock.view.component
 		}
 		public function setBounds(b:Rectangle):void
 		{
+			if(b.equals(bounds)) return;
+			
 			bounds = b;
 			fitMCtoWindow();
 		}
