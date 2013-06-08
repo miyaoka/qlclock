@@ -92,18 +92,6 @@ package jp.tp.qlclock.view.mediator
 			iconMenu.addItem(new NativeMenuItem("", true));//Separator
 			iconMenu.addItem(quitMenu);
 			
-			/*
-			if(NativeApplication.supportsSystemTrayIcon){
-				iconMenu.addItem(showCommand);
-				showCommand.addEventListener(Event.SELECT, undock);
-				iconMenu.addItem(new NativeMenuItem("", true));//Separator
-				var exitCommand: NativeMenuItem = iconMenu.addItem(new NativeMenuItem("Exit"));
-				exitCommand.addEventListener(Event.SELECT, exit);
-			}
-			iconMenu.addItem(new NativeMenuItem("", true));//Separator
-			iconMenu.addSubmenu(createSourceCodeMenu(), "Source code");
-			iconMenu.addEventListener(Event.DISPLAYING, setMenuCommandStates);
-			*/
 			return iconMenu;
 		}
 		private function loadIcons():void
@@ -130,9 +118,9 @@ package jp.tp.qlclock.view.mediator
 			loader.load(new URLRequest("assets/icons/icon" + sizes.shift() + ".png"));
 		}
 	
-		private var quitMenu:NativeMenuItem = new NativeMenuItem("quit");
-		private var restoreMenu:NativeMenuItem = new NativeMenuItem("restore bounds");
-		private var transparentMenu:NativeMenuItem = new NativeMenuItem("toggle transparent");
+		private var quitMenu:NativeMenuItem = new NativeMenuItem("Quit");
+		private var restoreMenu:NativeMenuItem = new NativeMenuItem("Reset bounds");
+		private var transparentMenu:NativeMenuItem = new NativeMenuItem("Toggle transparent");
 		private function onRestore(e:Event):void
 		{
 			sendNotification(AppConstants.RESTORE_DEFAULT_BOUNDS);
