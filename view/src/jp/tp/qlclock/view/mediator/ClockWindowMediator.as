@@ -2,7 +2,9 @@ package jp.tp.qlclock.view.mediator
 {
 	import flash.display.NativeMenu;
 	import flash.display.NativeMenuItem;
+	import flash.display.StageDisplayState;
 	import flash.events.Event;
+	import flash.events.FullScreenEvent;
 	import flash.events.NativeWindowBoundsEvent;
 	import flash.geom.Rectangle;
 	
@@ -41,6 +43,7 @@ package jp.tp.qlclock.view.mediator
 			//set view events
 			view.addEventListener(ClockWindowEvent.FRAME_RESIZE, onFrameResize);
 			view.addEventListener(FlexNativeWindowEvent.DRAG_MOVE, onFlexWindowMove);
+			view.stage.addEventListener(FullScreenEvent.FULL_SCREEN, onFullScreen);
 			
 			//set view appearance
 			view.clockMC.edit.visible = false;
@@ -138,31 +141,69 @@ package jp.tp.qlclock.view.mediator
 		
 		private function initContextMenu():void
 		{
-			restoreMenu.addEventListener(Event.SELECT, onRestore);
-			transparentMenu.addEventListener(Event.SELECT, onTrans);
-			quitMenu.addEventListener(Event.SELECT, onQuit);
+			restoreMenu.addEventListener(Event.SELECT, onSelectRestore);
+			transparentMenu.addEventListener(Event.SELECT, onSelectTransparent);
+			quitMenu.addEventListener(Event.SELECT, onSelectQuit);
+			keepTopMenu.addEventListener(Event.SELECT, onSelectKeepTop);
+			fullscreenMenu.addEventListener(Event.SELECT, onSelectFullscreen);
+			minimizeMenu.addEventListener(Event.SELECT, onSelectMinimize);
+			maximizeMenu.addEventListener(Event.SELECT, onSelectMaximize);
+			
+			transparentMenu.checked = transparent;
 			
 			var iconMenu:NativeMenu = new NativeMenu();
-			iconMenu.addItem(transparentMenu);
+			iconMenu.addItem(keepTopMenu);
 			iconMenu.addItem(restoreMenu);
+			iconMenu.addItem(new NativeMenuItem("", true));//Separator
+			iconMenu.addItem(fullscreenMenu);
+			iconMenu.addItem(minimizeMenu);
+			iconMenu.addItem(maximizeMenu);
+			iconMenu.addItem(new NativeMenuItem("", true));//Separator
+			iconMenu.addItem(transparentMenu);
 			iconMenu.addItem(new NativeMenuItem("", true));//Separator
 			iconMenu.addItem(quitMenu);			
 			view.clockMC.contextMenu = iconMenu;
 		}
 		private var quitMenu:NativeMenuItem = new NativeMenuItem("Close");
 		private var restoreMenu:NativeMenuItem = new NativeMenuItem("Reset bounds");
-		private var transparentMenu:NativeMenuItem = new NativeMenuItem("Toggle transparent");
-		private function onRestore(e:Event):void
+		private var transparentMenu:NativeMenuItem = new NativeMenuItem("Transparent");
+		private var fullscreenMenu:NativeMenuItem = new NativeMenuItem("Full Screen");
+		private var minimizeMenu:NativeMenuItem = new NativeMenuItem("Minimize");
+		private var maximizeMenu:NativeMenuItem = new NativeMenuItem("Maximize");
+		private var keepTopMenu:NativeMenuItem = new NativeMenuItem("Keep On Top");
+		private function onSelectRestore(e:Event):void
 		{
 			sendNotification(AppConstants.RESTORE_DEFAULT_BOUNDS);
 		}
-		private function onTrans(e:Event):void
+		private function onSelectTransparent(e:Event):void
 		{
 			sendNotification(AppConstants.TOGGLE_TRANSPARENT);
 		}
-		private function onQuit(e:Event):void
+		private function onSelectQuit(e:Event):void
 		{
 			close();
 		}		
+		private function onSelectKeepTop(e:Event):void
+		{
+			keepTopMenu.checked = view.alwaysInFront = !view.alwaysInFront;
+		}
+		private function onSelectFullscreen(e:Event):void
+		{
+			view.stage.displayState = (view.stage.displayState == StageDisplayState.NORMAL) 
+				? StageDisplayState.FULL_SCREEN 
+				: StageDisplayState.NORMAL;
+		}
+		private function onSelectMinimize(e:Event):void
+		{
+			view.minimize();
+		}
+		private function onSelectMaximize(e:Event):void
+		{
+			view.maximize();
+		}
+		private function onFullScreen(e:FullScreenEvent):void
+		{
+			fullscreenMenu.checked = e.fullScreen
+		}
 	}
 }
