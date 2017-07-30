@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:component="jp.tp.qlclock.view.component.*" xmlns:vo="jp.tp.qlclock.model.vo.*">
+	<s:layout>
+		<s:HorizontalLayout/>
+	</s:layout>
+	<fx:Declarations>
+		<vo:ClockConfVO id="vo"/>
+		<s:RadioButtonGroup id="radiogroup1"/>
+		<!-- 非ビジュアルエレメント (サービス、値オブジェクトなど) をここに配置 -->
+	</fx:Declarations>
+	<component:ScrollerFixed  height="100%">
+		<s:VGroup width="100%" height="100%">
+			<mx:LinkBar width="100%" height="100%" dataProvider="{vs_global}"
+						direction="vertical">
+			</mx:LinkBar>
+		</s:VGroup>
+	</component:ScrollerFixed>
+	
+	<component:ScrollerFixed width="100%" height="100%">
+		<s:Group width="100%" height="100%">
+			<mx:ViewStack id="vs_global" resizeToContent="true">
+				<s:NavigatorContent width="100%" height="100%" label="地域設定">
+					<s:layout>
+						<s:VerticalLayout/>
+					</s:layout>
+					<s:Form>
+						<s:FormItem label="表示言語">
+							<s:ComboBox/>
+						</s:FormItem>
+						<s:FormItem label="タイムゾーン">
+							<s:ComboBox/>
+						</s:FormItem>
+					</s:Form>
+				</s:NavigatorContent>
+				<s:NavigatorContent width="100%" height="100%" label="針の表示">
+					<s:layout>
+						<s:VerticalLayout/>
+					</s:layout>
+					<s:Form>
+						<s:FormHeading label="針の表示"/>
+						<s:FormItem label="秒針">
+						<s:RadioButton label="ticking" groupName="radiogroup1"/>
+						<s:RadioButton label="continuous" groupName="radiogroup1"/>
+						<s:RadioButton label="hide" groupName="radiogroup1"/>
+						</s:FormItem>
+					</s:Form>
+				</s:NavigatorContent>
+				<s:NavigatorContent width="100%" height="100%" label="サウンド">
+					<s:Form>
+						<s:FormItem label="AdditionalConfigFile">
+							<s:TextInput/>
+						</s:FormItem>
+						<s:FormItem label="UseEffect">
+							<s:CheckBox/>
+						</s:FormItem>
+					</s:Form>
+				</s:NavigatorContent>
+				<s:NavigatorContent width="100%" height="100%" label="その他">
+					<s:Form>
+						<s:FormItem label="UseOriginalPostProcessing">
+							<s:CheckBox/>
+						</s:FormItem>
+						<s:FormItem label="UseOriginalObjectsProcessing">
+							<s:CheckBox/>
+						</s:FormItem>
+						<s:FormItem label="EnableBloom">
+							<s:CheckBox/>
+						</s:FormItem>
+						<s:FormItem label="EnableAdaptation">
+							<s:CheckBox/>
+						</s:FormItem>
+						<s:FormItem label="EnableDepthOfField">
+							<s:CheckBox/>
+						</s:FormItem>
+						<s:FormItem label="EnableAmbientOcclusion">
+							<s:CheckBox/>
+						</s:FormItem>
+						<s:FormItem label="EnableDetailedShadow">
+							<s:CheckBox/>
+						</s:FormItem>
+						<s:FormItem label="EnableSunRays">
+							<s:CheckBox/>
+						</s:FormItem>
+						<s:FormItem label="EnableSkyLighting">
+							<s:CheckBox/>
+						</s:FormItem>
+						<s:FormItem label="EnableImageBasedLighting">
+							<s:CheckBox/>
+						</s:FormItem>
+						<s:FormItem label="EnableReflection">
+							<s:CheckBox/>
+						</s:FormItem>
+					</s:Form>
+				</s:NavigatorContent>
+			</mx:ViewStack>		
+		</s:Group>
+	</component:ScrollerFixed>				
+</s:Group>

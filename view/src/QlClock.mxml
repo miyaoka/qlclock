@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:WindowedApplication xmlns:fx="http://ns.adobe.com/mxml/2009" 
+					   xmlns:s="library://ns.adobe.com/flex/spark" 
+					   xmlns:mx="library://ns.adobe.com/flex/mx" 
+					   visible="false"
+					   addedToStage="windowedapplication1_addedToStageHandler(event)"
+					   creationComplete="windowedapplication1_creationCompleteHandler(event)"
+					   >
+	<fx:Script>
+		<![CDATA[
+			import jp.tp.qlclock.ApplicationFacade;
+			import jp.tp.qlclock.assets.Clock;
+			import jp.tp.qlclock.view.component.ClockContainer;
+			import jp.tp.qlclock.view.component.ClockWindow;
+			import jp.tp.qlclock.view.component.ConfigView;
+			import jp.tp.qlclock.view.component.ConfigWindow;
+			import jp.tp.qlclock.view.component.FlexNativeWindow;
+			
+			import mx.core.IUIComponent;
+			import mx.core.UIComponent;
+			import mx.events.FlexEvent;
+			
+			protected function windowedapplication1_creationCompleteHandler(event:FlexEvent):void
+			{
+				ApplicationFacade.getInstance().startup(this);
+			}
+			
+			protected function windowedapplication1_addedToStageHandler(event:Event):void
+			{
+				//close default windowed app(this)
+				close();
+			}
+			
+		]]>
+	</fx:Script>
+	<fx:Declarations>
+		<!-- 非ビジュアルエレメント (サービス、値オブジェクトなど) をここに配置 -->
+	</fx:Declarations>
+</s:WindowedApplication>
